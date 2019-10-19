@@ -58,28 +58,3 @@ char* ulog_print(void)
     return ulog_msg_buff[ ulog_msg_q[  q_head++ ].msg ];
 }
 
-
-int main(int argc, char *argv[])
-{
-    ulog_init(INFO);
-    ulog_set_msg(0,"message 0");
-    ulog_set_msg(1,"message 1");
-    ulog_set_msg(2,"message 2");
-
-    ulog_log(0,INFO);
-    ulog_log(0,INFO);
-    ulog_log(1,INFO);
-
-    char* buff = NULL;
-
-    do {
-        buff = ulog_print();
-
-        if (buff != NULL)
-            printf("%s\n", buff);
-
-    } while (buff != NULL);
-
-    return 0;
-}
-
