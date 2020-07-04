@@ -2,8 +2,11 @@
 #include "ulog.h"
 #include "string.h"
 
+#define MAIN_TEST
+
 // main msg buffer
 char ulog_msg_buff[ULOG_MSG_MAX_N][ULOG_MSG_MAX_LEN] = {};
+char* ulog_msg_lev[4] = {"","INFO:","WARN:","ERR:"};
 volatile ulog_log_t ulog_msg_q[ULOG_MSG_Q_MAX] = {};
 ulog_lev_t print_level = INFO;
 
@@ -37,10 +40,14 @@ int ulog_set_msg(uint8_t id, char* msg)
 
 int ulog_log(uint8_t id, ulog_lev_t level)
 {
+    if (level >= print_level) { // filter by level
+
     ulog_msg_q[ q_tail++ ].msg = id;
 
     if (q_tail == ULOG_MSG_Q_MAX) { // queue is full
        return -1;
+    }
+
     }
 
     return 0;
@@ -58,3 +65,30 @@ char* ulog_print(void)
     return ulog_msg_buff[ ulog_msg_q[  q_head++ ].msg ];
 }
 
+#ifdef MAIN_TEST
+
+int main(int argc, char *argv[])
+{
+    ulog_init(ERR);
+
+    ulog_set_msg(0,"message 0");
+    ulog_set_msg(1,"message 1");
+    ulog_set_msg(2,"message 2");
+
+    ulog_log(0,INFO);
+    ulog_log(0,WARN);
+    ulog_log(1,ERR);
+
+    char* buff = NULL;
+    do {
+        buff = ulog_print();
+
+        if (buff != NULL)
+            printf("%s\n", buff);
+
+    } while (buff != NULL);
+
+    return 0;
+}
+
+#endif
